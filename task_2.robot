@@ -37,38 +37,38 @@ Add most expensive items into cart
     Validate cart
 
 ***Keywords***
-    Handle cookies
-        # Close cookies dialog by approving it
-        Wait Until Element Is Visible   ${cookies_dialog}
-        Click Button    ${cookies_dialog_accept}
+Handle cookies
+    # Close cookies dialog by approving it
+    Wait Until Element Is Visible   ${cookies_dialog}
+    Click Button    ${cookies_dialog_accept}
 
-    Go to category
-        Click Element   ${shop_category}
-    
-    Go to subcategory
-        # Just to be sure that subcategories were fetched from the API
-        Wait Until Element Is Visible  class:category-tree-box-list
-        Click Element   ${shop_subcategory}
+Go to category
+    Click Element   ${shop_category}
 
-    Sort products
-        Select From List By Value   name:orderBy    ${shop_order_option}
-        # Wait for data to be properly sorted
+Go to subcategory
+    # Just to be sure that subcategories were fetched from the API
+    Wait Until Element Is Visible  class:category-tree-box-list
+    Click Element   ${shop_subcategory}
+
+Sort products
+    Select From List By Value   name:orderBy    ${shop_order_option}
+    # Wait for data to be properly sorted
+    BuiltIn.Sleep   1s
+
+Iterate through the product and add them into cart
+    ${products}=    Get WebElements    ${shop_add_to_cart}
+    ${index}=   BuiltIn.Set Variable    1
+    FOR    ${product}    IN    @{products}
+        Scroll Element Into View    ${product}
+        Exit For Loop If    ${index} > ${count_of_items_to_add}
+        Click Button    ${product}
         BuiltIn.Sleep   1s
+        Press Keys    None    ESC
+        ${index}=   Evaluate    ${index} + 1
+    END
 
-    Iterate through the product and add them into cart
-        ${products}=    Get WebElements    ${shop_add_to_cart}
-        ${index}=   BuiltIn.Set Variable    1
-        FOR    ${product}    IN    @{products}
-            Scroll Element Into View    ${product}
-            Exit For Loop If    ${index} > ${count_of_items_to_add}
-            Click Button    ${product}
-            BuiltIn.Sleep   1s
-            Press Keys    None    ESC
-            ${index}=   Evaluate    ${index} + 1
-        END
-
-    Validate cart
-        Click Element   ${shop_cart}
-        # Get count of items from cart and compare it to the expected amount
-        ${count}=  Get Element Count   ${shop_product_cart_item}
-        Should Be True  ${count} == ${count_of_items_to_add}
+Validate cart
+    Click Element   ${shop_cart}
+    # Get count of items from cart and compare it to the expected amount
+    ${count}=  Get Element Count   ${shop_product_cart_item}
+    Should Be True  ${count} == ${count_of_items_to_add}
